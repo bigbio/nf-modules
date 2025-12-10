@@ -1,0 +1,10 @@
+{
+    "name": "nf-modules",
+    "homePage": "https://github.com/bigbio/nf-modules",
+    "repos": {
+        "nf-core": {
+            "modules": {},
+            "subworkflows": {}
+        }
+    }
+}

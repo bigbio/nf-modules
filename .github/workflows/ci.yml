@@ -1,0 +1,44 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - main
+            - dev
+    pull_request:
+    workflow_dispatch:
+
+jobs:
+    prettier:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Install Prettier
+              run: npm install -g prettier
+
+            - name: Run Prettier check
+              run: prettier --check .
+
+    editorconfig:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install editorconfig-checker
+              run: pip install editorconfig-checker
+
+            - name: Run editorconfig-checker
+              run: ec
