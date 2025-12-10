@@ -25,7 +25,7 @@ output:
           type: map
           description: |
               Groovy Map containing sample information
-              e.g. [ id:'MD5', enzyme:trypsin ]
+              e.g. [ id:'sample1', mzml_id:'UPS1_50amol_R3' ]
     - mzmls_converted:
           type: file
           description: indexed mzML files
