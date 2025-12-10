@@ -7,6 +7,27 @@ nextflow_process {
     tag "modules_bigbio"
     tag "thermorawfileparser"
 
+    test("Should convert RAW to mzML") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id: 'test', mzml_id: 'UPS1_50amol_R3' ],
+                    file('https://ftp.ebi.ac.uk/pride-archive/2015/12/PXD001819/UPS1_50amol_R3.raw', checkIfExists: false)
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out.versions).match("versions")
+            assert process.out.mzmls_converted[0][1] ==~ /.*\.mzML/
+            assert process.out.log.size() == 1
+        }
+    }
+
     test("Should run stub mode") {
 
         options "-stub"
@@ -24,29 +45,8 @@ nextflow_process {
 
         then {
             assert process.success
-            assert snapshot(process.out).match()
+            assert snapshot(process.out).match("stub")
         }
     }
-
-    // TODO: Add integration test with real RAW file when test data repository is available
-    // test("Should convert RAW to mzML") {
-    //     when {
-    //         process {
-    //             """
-    //             input[0] = [
-    //                 [ id: 'test', mzml_id: 'test_sample' ],
-    //                 file(params.test_data['proteomics']['thermorawfileparser']['test_raw'], checkIfExists: true)
-    //             ]
-    //             """
-    //         }
-    //     }
-    //
-    //     then {
-    //         assert process.success
-    //         assert snapshot(process.out.versions).match("versions")
-    //         assert process.out.mzmls_converted[0][1] ==~ /.*\.mzML/
-    //         assert process.out.log.size() == 1
-    //     }
-    // }
 }
 
