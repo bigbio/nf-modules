@@ -204,11 +204,19 @@ jobs:
                       --tap test_results/${MODULE_PATH}/test.tap \
                       ${TEST_FILE}
 
+            - name: Sanitize module name for artifact
+              if: always()
+              id: sanitize
+              run: |
+                  # Replace / with - to make valid artifact name
+                  SANITIZED=$(echo "${{ matrix.module }}" | tr '/' '-')
+                  echo "name=test-results-${{ matrix.profile }}-${SANITIZED}" >> $GITHUB_OUTPUT
+
             - name: Upload test results
               if: always()
               uses: actions/upload-artifact@v4
               with:
-                  name: test-results-${{ matrix.profile }}-${{ matrix.module }}
+                  name: ${{ steps.sanitize.outputs.name }}
                   path: test_results/${{ matrix.module }}/
                   retention-days: 7
 
