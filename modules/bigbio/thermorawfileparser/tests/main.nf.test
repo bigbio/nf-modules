@@ -32,16 +32,12 @@ nextflow_process {
 
         options "-stub"
 
-        setup {
-            new File("test_sample.raw").createNewFile()
-        }
-
         when {
             process {
                 """
                 input[0] = [
                     [ id: 'test', mzml_id: 'test_sample' ],
-                    file('test_sample.raw')
+                    file(params.test_data['proteomics']['msspectra']['ups1_50amol_r3'], checkIfExists: false)
                 ]
                 """
             }
