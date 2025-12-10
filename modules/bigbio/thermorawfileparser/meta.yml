@@ -1,5 +1,5 @@
 name: thermorawfileparser
-description: convert raw file to mzml files
+description: Convert RAW file to mzML files
 keywords:
     - raw
     - mzML
