@@ -9,23 +9,23 @@ process THERMORAWFILEPARSER {
         'https://depot.galaxyproject.org/singularity/thermorawfileparser:1.4.5--h05cac1d_1' :
         'biocontainers/thermorawfileparser:1.4.5--h05cac1d_1' }"
 
-    /*
-     * stageInMode retry strategy rationale:
-     * - Attempt 1: Use 'link' for most executors, 'symlink' for AWS Batch (due to file system constraints).
-     * - Attempt 2: Use 'symlink' for most executors, 'copy' for AWS Batch (if linking failed).
-     * - Attempt 3+: Always use 'copy' to maximize reliability.
-     */
-    def selectStageInMode(attempt, executor) {
-        if (attempt == 1) {
-            return executor == "awsbatch" ? 'symlink' : 'link'
-        } else if (attempt == 2) {
-            return executor == "awsbatch" ? 'copy' : 'symlink'
+    stageInMode {
+        if (task.attempt == 1) {
+            if (task.executor == "awsbatch") {
+                'symlink'
+            } else {
+                'link'
+            }
+        } else if (task.attempt == 2) {
+            if (task.executor == "awsbatch") {
+                'copy'
+            } else {
+                'symlink'
+            }
         } else {
-            return 'copy'
+            'copy'
         }
     }
-
-    stageInMode { selectStageInMode(task.attempt, task.executor) }
     input:
     tuple val(meta), path(rawfile)
 
