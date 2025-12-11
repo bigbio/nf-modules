@@ -150,11 +150,6 @@ jobs:
                       } >> $GITHUB_OUTPUT
                   fi
 
-            - name: Debug
-              run: |
-                  echo "Test files: ${{ steps.list.outputs.test_files }}"
-                  echo "Modules: ${{ steps.components.outputs.modules }}"
-
     test-modules:
         name: "${{ matrix.profile }} | ${{ matrix.module }}"
         needs: [detect-changed-modules]
@@ -237,11 +232,3 @@ jobs:
             - name: All tests ok
               if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
               run: exit 0
-
-            - name: Debug
-              if: always()
-              run: |
-                  echo "::group::DEBUG: Test Results"
-                  echo "DEBUG: toJSON(needs) = ${{ toJSON(needs) }}"
-                  echo "DEBUG: toJSON(needs.*.result) = ${{ toJSON(needs.*.result) }}"
-                  echo "::endgroup::"
