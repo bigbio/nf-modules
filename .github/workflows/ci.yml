@@ -140,7 +140,7 @@ jobs:
                   TEST_FILES='${{ steps.list.outputs.test_files }}'
                   echo "DEBUG: TEST_FILES value: $TEST_FILES"
                   echo "DEBUG: TEST_FILES length: ${#TEST_FILES}"
-                  
+
                   if [ "$TEST_FILES" == "[]" ] || [ -z "$TEST_FILES" ]; then
                       echo 'modules=[]' >> $GITHUB_OUTPUT
                       echo "DEBUG: No modules detected, setting modules=[]"
