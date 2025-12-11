@@ -23,7 +23,7 @@ nextflow_process {
         then {
             assert process.success
             assert snapshot(process.out.versions).match("versions")
-            assert new File(process.out.mzmls_converted[0][1]).name == 'TMT_Erwinia_1uLSike_Top10HCD_isol2_45stepped_60min_01.mzML'
+            assert new File(process.out.convert_files[0][1]).name == 'TMT_Erwinia_1uLSike_Top10HCD_isol2_45stepped_60min_01.mzML'
             assert process.out.log.size() == 1
         }
     }
@@ -46,7 +46,7 @@ nextflow_process {
         then {
             assert process.success
             assert snapshot(process.out.versions).match("versions_stub")
-            assert new File(process.out.mzmls_converted[0][1]).name == 'test_sample.mzML'
+            assert new File(process.out.convert_files[0][1]).name == 'test_sample.mzML'
             assert process.out.log.size() == 1
         }
     }
