@@ -9,11 +9,15 @@ tools:
           description: |
               A library for proteomics QC report based on MultiQC framework.
               Use `task.ext.args` to pass additional arguments, e.g.:
-              - `--quantms_plugin` to enable quantms plugin
+              - `--quantms_plugin` for quantms/dia/tmt/lfq data
+              - `--diann_plugin` for DIANN data
+              - `--maxquant_plugin` for MaxQuant data
+              - `--proteobench_plugin` for ProteoBench data
+              - `--mzid_plugin` for mzID data
               - `--disable_table` to disable table plots
               - `--ignored_idxml` to ignore idxML files
               - `--contaminant_affix VALUE` to specify contaminant affix
-              - `--quantification_method VALUE` to specify quantification method
+              - `--quantification_method VALUE` to specify quantification method (used with quantms_plugin)
           homepage: https://github.com/bigbio/pmultiqc/
           documentation: https://github.com/bigbio/pmultiqc/
 input:
@@ -29,7 +33,7 @@ input:
     - multiqc_config:
           type: file
           description: |
-              MultiQC configuration file
+              MultiQC configuration file (optional)
           pattern: "*.yml"
 output:
     - meta:

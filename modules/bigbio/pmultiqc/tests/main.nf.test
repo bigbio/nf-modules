@@ -7,24 +7,95 @@ nextflow_process {
     tag "modules_bigbio"
     tag "pmultiqc"
 
+    config "./nextflow.config"
+
     test("Should generate MultiQC report") {
 
         when {
             process {
                 """
-                input[0] = [
-                    [ id: 'test' ],
-                    file(params.test_data['proteomics']['qc']['results'], checkIfExists: false)
-                ]
+                input[0] = Channel.of([ id: 'test' ], file(params.test_data['proteomics']['qc']['results'], checkIfExists: false))
+                input[1] = []
                 """
             }
         }
 
         then {
-            assert process.success
-            assert snapshot(process.out.versions).match("versions")
-            assert process.out.report.size() == 1
-            assert process.out.data.size() == 1
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.findAll { key, val -> key.startsWith("versions")}).match() }
+            )
+        }
+    }
+
+    test("Should generate MultiQC report with config") {
+
+        when {
+            process {
+                """
+                input[0] = Channel.of([ id: 'test' ], file(params.test_data['proteomics']['qc']['results'], checkIfExists: false))
+                input[1] = Channel.of(file('multiqc_config.yml', checkIfExists: false))
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.findAll { key, val -> key.startsWith("versions")}).match() }
+            )
+        }
+    }
+
+    test("Should generate MultiQC report for DIANN") {
+        config "./nextflow.config.diann"
+
+        when {
+            process {
+                """
+                input[0] = Channel.of([ id: 'DIANN_test' ], file(params.test_data['proteomics']['qc']['diann_results'], checkIfExists: false))
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.findAll { key, val -> key.startsWith("versions")}).match() }
+            )
+        }
+    }
+
+    test("Should generate MultiQC report for quantms") {
+        config "./nextflow.config.quantms"
+
+        when {
+            process {
+                """
+                input[0] = Channel.of([ id: 'quantms_test' ], file(params.test_data['proteomics']['qc']['quantms_results'], checkIfExists: false))
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.findAll { key, val -> key.startsWith("versions")}).match() }
+            )
+            // quantms may generate a database file
+            if (process.out.quantmsdb.size() > 0) {
+                assert process.out.quantmsdb[0].name.endsWith('.db')
+            }
         }
     }
 
@@ -35,79 +106,19 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = [
-                    [ id: 'test_sample' ],
-                    file(params.test_data['proteomics']['qc']['results'], checkIfExists: false)
-                ]
+                input[0] = Channel.of([ id: 'test_sample' ], file(params.test_data['proteomics']['qc']['results'], checkIfExists: false))
+                input[1] = []
                 """
             }
         }
 
         then {
-            assert process.success
-            assert snapshot(process.out.versions).match("versions_stub")
-            assert new File(process.out.report[0][1]).name == 'test_sample_multiqc_report.html'
-            assert process.out.data.size() == 1
-        }
-    }
-
-    test("Should generate MultiQC report for DIANN") {
-
-        when {
-            params {
-                process {
-                    withName: 'PMULTIQC' {
-                        ext.args = '--quantification_method diann'
-                    }
-                }
-            }
-            process {
-                """
-                input[0] = [
-                    [ id: 'DIANN_test' ],
-                    file(params.test_data['proteomics']['qc']['diann_results'], checkIfExists: false)
-                ]
-                """
-            }
-        }
-
-        then {
-            assert process.success
-            assert snapshot(process.out.versions).match("versions")
-            assert process.out.report.size() == 1
-            assert process.out.data.size() == 1
-        }
-    }
-
-    test("Should generate MultiQC report for quantms") {
-
-        when {
-            params {
-                process {
-                    withName: 'PMULTIQC' {
-                        ext.args = '--quantms_plugin --quantification_method lfq'
-                    }
-                }
-            }
-            process {
-                """
-                input[0] = [
-                    [ id: 'quantms_test' ],
-                    file(params.test_data['proteomics']['qc']['quantms_results'], checkIfExists: false)
-                ]
-                """
-            }
-        }
-
-        then {
-            assert process.success
-            assert snapshot(process.out.versions).match("versions")
-            assert process.out.report.size() == 1
-            assert process.out.data.size() == 1
-            // quantms may generate a database file
-            if (process.out.quantmsdb.size() > 0) {
-                assert process.out.quantmsdb[0].name.endsWith('.db')
-            }
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.report.collect { file(it[1]).getName() } +
+                                process.out.data.collect { file(it).getName() } +
+                                process.out.findAll { key, val -> key.startsWith("versions")} ).match() }
+            )
         }
     }
 }
