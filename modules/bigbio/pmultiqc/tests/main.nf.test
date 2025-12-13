@@ -103,7 +103,7 @@ nextflow_process {
             )
             // quantms may generate a database file
             if (process.out.quantmsdb.size() > 0) {
-                assert process.out.quantmsdb[0].name.endsWith('.db')
+                assert process.out.quantmsdb[0].getName().endsWith('.db')
             }
         }
     }
