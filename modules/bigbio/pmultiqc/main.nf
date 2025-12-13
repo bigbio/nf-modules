@@ -42,7 +42,7 @@ process PMULTIQC {
 
     """
     touch '${prefix}_multiqc_report.html'
-    touch 'multiqc_data'
+    mkdir 'multiqc_data'
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
