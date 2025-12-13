@@ -1,0 +1,249 @@
+nextflow_process {
+
+    name "Test Process PMULTIQC"
+    script "../main.nf"
+    process "PMULTIQC"
+    tag "modules"
+    tag "modules_bigbio"
+    tag "pmultiqc"
+
+    config "./nextflow.config"
+
+    test("Should generate MultiQC report") {
+
+        when {
+            def zipUrl = params.test_data['proteomics']['qc']['results']
+            def zipFile = new File("test_results.zip")
+            zipFile.withOutputStream { out ->
+                out << new URL(zipUrl).openStream()
+            }
+            def resultsDir = new File("test_results")
+            resultsDir.mkdirs()
+            
+            // Extract zip using Groovy's built-in zip handling
+            new java.util.zip.ZipFile(zipFile).withCloseable { zip ->
+                zip.entries().each { entry ->
+                    if (!entry.isDirectory()) {
+                        def file = new File(resultsDir, entry.name)
+                        file.parentFile.mkdirs()
+                        file.withOutputStream { out ->
+                            out << zip.getInputStream(entry)
+                        }
+                    }
+                }
+            }
+            zipFile.delete()
+            
+            process {
+                """
+                input[0] = [
+                    [ id: 'test' ],
+                    file(resultsDir, checkIfExists: false)
+                ]
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.versions).match("versions") }
+            )
+        }
+    }
+
+    test("Should generate MultiQC report with config") {
+
+        when {
+            def zipUrl = params.test_data['proteomics']['qc']['results']
+            def zipFile = new File("test_results_config.zip")
+            zipFile.withOutputStream { out ->
+                out << new URL(zipUrl).openStream()
+            }
+            def resultsDir = new File("test_results_config")
+            resultsDir.mkdirs()
+            
+            // Extract zip using Groovy's built-in zip handling
+            new java.util.zip.ZipFile(zipFile).withCloseable { zip ->
+                zip.entries().each { entry ->
+                    if (!entry.isDirectory()) {
+                        def file = new File(resultsDir, entry.name)
+                        file.parentFile.mkdirs()
+                        file.withOutputStream { out ->
+                            out << zip.getInputStream(entry)
+                        }
+                    }
+                }
+            }
+            zipFile.delete()
+            
+            process {
+                """
+                input[0] = [
+                    [ id: 'test' ],
+                    file(resultsDir, checkIfExists: false)
+                ]
+                input[1] = file('multiqc_config.yml', checkIfExists: false)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.versions).match("versions") }
+            )
+        }
+    }
+
+    test("Should generate MultiQC report for DIANN") {
+        config "./nextflow.config.diann"
+
+        when {
+            def zipUrl = params.test_data['proteomics']['qc']['diann_results']
+            def zipFile = new File("test_diann.zip")
+            zipFile.withOutputStream { out ->
+                out << new URL(zipUrl).openStream()
+            }
+            def resultsDir = new File("test_diann_results")
+            resultsDir.mkdirs()
+            
+            // Extract zip using Groovy's built-in zip handling
+            new java.util.zip.ZipFile(zipFile).withCloseable { zip ->
+                zip.entries().each { entry ->
+                    if (!entry.isDirectory()) {
+                        def file = new File(resultsDir, entry.name)
+                        file.parentFile.mkdirs()
+                        file.withOutputStream { out ->
+                            out << zip.getInputStream(entry)
+                        }
+                    }
+                }
+            }
+            zipFile.delete()
+            
+            process {
+                """
+                input[0] = [
+                    [ id: 'DIANN_test' ],
+                    file(resultsDir, checkIfExists: false)
+                ]
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.versions).match("versions") }
+            )
+        }
+    }
+
+    test("Should generate MultiQC report for quantms") {
+        config "./nextflow.config.quantms"
+
+        when {
+            def zipUrl = params.test_data['proteomics']['qc']['quantms_results']
+            def zipFile = new File("test_quantms.zip")
+            zipFile.withOutputStream { out ->
+                out << new URL(zipUrl).openStream()
+            }
+            def resultsDir = new File("test_quantms_results")
+            resultsDir.mkdirs()
+            
+            // Extract zip using Groovy's built-in zip handling
+            new java.util.zip.ZipFile(zipFile).withCloseable { zip ->
+                zip.entries().each { entry ->
+                    if (!entry.isDirectory()) {
+                        def file = new File(resultsDir, entry.name)
+                        file.parentFile.mkdirs()
+                        file.withOutputStream { out ->
+                            out << zip.getInputStream(entry)
+                        }
+                    }
+                }
+            }
+            zipFile.delete()
+            
+            process {
+                """
+                input[0] = [
+                    [ id: 'quantms_test' ],
+                    file(resultsDir, checkIfExists: false)
+                ]
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.report[0][1] ==~ ".*\\.html" },
+                { assert process.out.data[0] ==~ ".*_data" },
+                { assert snapshot(process.out.versions).match("versions") }
+            )
+            // quantms may generate a database file
+            if (process.out.quantmsdb.size() > 0) {
+                assert process.out.quantmsdb[0].getName().endsWith('.db')
+            }
+        }
+    }
+
+    test("Should run stub mode") {
+
+        options "-stub"
+
+        when {
+            def zipUrl = params.test_data['proteomics']['qc']['results']
+            def zipFile = new File("test_stub.zip")
+            zipFile.withOutputStream { out ->
+                out << new URL(zipUrl).openStream()
+            }
+            def resultsDir = new File("test_stub_results")
+            resultsDir.mkdirs()
+            
+            // Extract zip using Groovy's built-in zip handling
+            new java.util.zip.ZipFile(zipFile).withCloseable { zip ->
+                zip.entries().each { entry ->
+                    if (!entry.isDirectory()) {
+                        def file = new File(resultsDir, entry.name)
+                        file.parentFile.mkdirs()
+                        file.withOutputStream { out ->
+                            out << zip.getInputStream(entry)
+                        }
+                    }
+                }
+            }
+            zipFile.delete()
+            
+            process {
+                """
+                input[0] = [
+                    [ id: 'test_sample' ],
+                    file(resultsDir, checkIfExists: false)
+                ]
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.report.collect { file(it[1]).getName() } +
+                                process.out.data.collect { file(it).getName() } +
+                                process.out.versions).match("versions_stub") }
+            )
+        }
+    }
+}

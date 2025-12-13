@@ -1,0 +1,7 @@
+versions:
+  PMULTIQC:
+    pmultiqc: "0.0.39"
+
+versions_stub:
+  PMULTIQC:
+    pmultiqc: "0.0.39"
