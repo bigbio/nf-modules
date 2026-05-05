@@ -39,7 +39,7 @@ process PRIDEPY_DOWNLOAD {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pridepy: 0.0.14
+        pridepy: \$(python -c "from importlib.metadata import version; print(version('pridepy'))" || echo "unknown")
     END_VERSIONS
     """
 }
