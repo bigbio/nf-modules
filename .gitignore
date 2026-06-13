@@ -208,3 +208,9 @@ nf.test.snap
 .idea/
 
 .nf-test*
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
+
+# Test data downloaded at CI runtime
+tests/data/

@@ -13,11 +13,12 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = [
-                    [ id: 'test', mzml_id: 'test_sample' ],
-                    file(params.test_data['proteomics']['onsite']['mzml'], checkIfExists: true),
-                    file(params.test_data['proteomics']['onsite']['idxml'], checkIfExists: true)
-                ]
+                input[0] = channel.from([
+                    [
+                        [ id: 'test', mzml_id: 'test_sample' ],
+                        file(params.test_data['proteomics']['onsite']['mzml'], checkIfExists: true)
+                    ]
+                ]).combine(channel.fromPath(params.test_data['proteomics']['onsite']['idparquet']))
                 """
             }
             params {
@@ -31,7 +32,7 @@ nextflow_process {
             assert process.out.ptm_in_id_onsite.size() == 1
             assert process.out.log.size() == 1
             // Check output file has correct naming
-            assert process.out.ptm_in_id_onsite[0][1].toString().endsWith('_ascore.idXML')
+            assert process.out.ptm_in_id_onsite[0][1].toString().endsWith('_ascore.idparquet')
         }
     }
 
@@ -43,7 +44,7 @@ nextflow_process {
                 input[0] = [
                     [ id: 'test', mzml_id: 'test_sample' ],
                     file(params.test_data['proteomics']['onsite']['mzml'], checkIfExists: true),
-                    file(params.test_data['proteomics']['onsite']['idxml'], checkIfExists: true)
+                    file(params.test_data['proteomics']['onsite']['idparquet'], checkIfExists: true)
                 ]
                 """
             }
@@ -58,7 +59,7 @@ nextflow_process {
             assert process.out.ptm_in_id_onsite.size() == 1
             assert process.out.log.size() == 1
             // Check output file has correct naming
-            assert process.out.ptm_in_id_onsite[0][1].toString().endsWith('_phosphors.idXML')
+            assert process.out.ptm_in_id_onsite[0][1].toString().endsWith('_phosphors.idparquet')
         }
     }
 
@@ -70,7 +71,7 @@ nextflow_process {
                 input[0] = [
                     [ id: 'test', mzml_id: 'test_sample' ],
                     file(params.test_data['proteomics']['onsite']['mzml'], checkIfExists: true),
-                    file(params.test_data['proteomics']['onsite']['idxml'], checkIfExists: true)
+                    file(params.test_data['proteomics']['onsite']['idparquet'], checkIfExists: true)
                 ]
                 """
             }
@@ -85,7 +86,7 @@ nextflow_process {
             assert process.out.ptm_in_id_onsite.size() == 1
             assert process.out.log.size() == 1
             // Check output file has correct naming
-            assert process.out.ptm_in_id_onsite[0][1].toString().endsWith('_lucxor.idXML')
+            assert process.out.ptm_in_id_onsite[0][1].toString().endsWith('_lucxor.idparquet')
         }
     }
 
@@ -99,7 +100,7 @@ nextflow_process {
                 input[0] = [
                     [ id: 'test', mzml_id: 'test_sample' ],
                     file(params.test_data['proteomics']['onsite']['mzml'], checkIfExists: true),
-                    file(params.test_data['proteomics']['onsite']['idxml'], checkIfExists: true)
+                    file(params.test_data['proteomics']['onsite']['idparquet'], checkIfExists: true)
                 ]
                 """
             }

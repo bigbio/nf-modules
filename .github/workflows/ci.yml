@@ -167,9 +167,22 @@ jobs:
           wget -qO- https://code.askimed.com/install/nf-test | bash -s ${{ env.NFT_VER }}
           sudo mv nf-test /usr/local/bin/
 
+      - name: Download onsite test data directory
+        if: matrix.module == 'bigbio/onsite'
+        run: |
+          DIR="tests/data/onsite/Phospho_redissolve_final_01_clean_perc.idparquet"
+          mkdir -p "$DIR"
+          BASE_URL="https://ftp.pride.ebi.ac.uk/pub/databases/pride/resources/proteomes/quantms-ci-github/onsite/Phospho_redissolve_final_01_clean_perc.idparquet"
+          for f in psms.parquet proteins.parquet protein_groups.parquet search_params.parquet; do
+            echo "Downloading $f ..."
+            curl -sL -o "$DIR/$f" "$BASE_URL/$f"
+          done
+          ls -lh "$DIR"
+
       - name: Run nf-test for ${{ matrix.module }}
         env:
           PROFILE: ${{ matrix.profile }}
+          ONSITE_IDPARQUET_PATH: ${{ github.workspace }}/tests/data/onsite/Phospho_redissolve_final_01_clean_perc.idparquet
         run: |
           MODULE_PATH="${{ matrix.module }}"
           TEST_FILE="modules/${MODULE_PATH}/tests/main.nf.test"

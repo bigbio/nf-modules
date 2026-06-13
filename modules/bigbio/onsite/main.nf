@@ -4,14 +4,14 @@ process ONSITE {
     label 'onsite'
 
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'https://depot.galaxyproject.org/singularity/pyonsite:0.0.2--pyhdfd78af_0'
-        : 'biocontainers/pyonsite:0.0.2--pyhdfd78af_0'}"
+        ? 'oras://ghcr.io/bigbio/pyonsite-sif:0.0.3'
+        : 'ghcr.io/bigbio/pyonsite:0.0.3'}"
 
     input:
     tuple val(meta), path(mzml_file), path(id_file)
 
     output:
-    tuple val(meta), path("${prefix}_*.idXML"), emit: ptm_in_id_onsite
+    tuple val(meta), path("${prefix}_*.idparquet"), emit: ptm_in_id_onsite
     path "versions.yml", emit: versions
     path "*.log", emit: log
 
@@ -48,7 +48,7 @@ process ONSITE {
         onsite ascore \\
             -in ${mzml_file} \\
             -id ${id_file} \\
-            -out ${prefix}_ascore.idXML \\
+            -out ${prefix}_ascore.idparquet \\
             --fragment-mass-tolerance ${fragment_tolerance} \\
             --fragment-mass-unit ${fragment_unit}${optional_flags ? ' \\\n            ' + optional_flags : ''}
         """
@@ -61,7 +61,7 @@ process ONSITE {
         onsite phosphors \\
             -in ${mzml_file} \\
             -id ${id_file} \\
-            -out ${prefix}_phosphors.idXML \\
+            -out ${prefix}_phosphors.idparquet \\
             --fragment-mass-tolerance ${fragment_tolerance} \\
             --fragment-mass-unit ${fragment_unit}${optional_flags ? ' \\\n            ' + optional_flags : ''}
             ${args}
@@ -92,7 +92,7 @@ process ONSITE {
         onsite lucxor \\
             -in ${mzml_file} \\
             -id ${id_file} \\
-            -out ${prefix}_lucxor.idXML \\
+            -out ${prefix}_lucxor.idparquet \\
             --fragment-method ${fragment_method} \\
             --fragment-mass-tolerance ${fragment_tolerance} \\
             --fragment-error-units ${fragment_unit} \\

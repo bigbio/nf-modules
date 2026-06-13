@@ -35,8 +35,8 @@ input:
         ontologies: []
     - id_file:
         type: file
-        description: Protein/peptide identifications file in idXML format
-        pattern: "*.idXML"
+        description: Protein/peptide identifications file in idparquet format
+        pattern: "*.idparquet"
         ontologies: []
 output:
   ptm_in_id_onsite:
@@ -44,11 +44,11 @@ output:
           type: map
           description: |
             Groovy Map containing sample information
-      - ${prefix}_*.idXML:
+      - ${prefix}_*.idparquet:
           type: file
-          description: Output idXML file containing PTM localization results from
+          description: Output idparquet file containing PTM localization results from
             onsite
-          pattern: "${prefix}_*.idXML"
+          pattern: "${prefix}_*.idparquet"
           ontologies: []
   log:
     - "*.log":
