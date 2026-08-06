@@ -96,18 +96,22 @@ jobs:
           TEST_FILES=()
 
           while IFS= read -r file; do
-              # Check if file is in modules directory
-              if [[ "$file" =~ ^modules/([^/]+)/([^/]+)/ ]]; then
-                  org="${BASH_REMATCH[1]}"
-                  module="${BASH_REMATCH[2]}"
-                  test_file="modules/${org}/${module}/tests/main.nf.test"
-
-                  # Check if test exists
-                  if [ -f "$test_file" ]; then
-                      if [[ ! " ${TEST_FILES[@]} " =~ " ${test_file} " ]]; then
-                          TEST_FILES+=("$test_file")
+              # Walk up from the changed file to the nearest module (the closest
+              # ancestor dir with tests/main.nf.test). This handles both flat
+              # modules (modules/org/tool/) and subtool modules
+              # (modules/org/tool/subtool/), e.g. bigbio/qpx/diann.
+              if [[ "$file" == modules/* ]]; then
+                  dir=$(dirname "$file")
+                  while [[ "$dir" == modules/* && "$dir" != "modules" ]]; do
+                      test_file="${dir}/tests/main.nf.test"
+                      if [ -f "$test_file" ]; then
+                          if [[ ! " ${TEST_FILES[@]} " =~ " ${test_file} " ]]; then
+                              TEST_FILES+=("$test_file")
+                          fi
+                          break
                       fi
-                  fi
+                      dir=$(dirname "$dir")
+                  done
               fi
           done <<< "$CHANGED_FILES"
 
