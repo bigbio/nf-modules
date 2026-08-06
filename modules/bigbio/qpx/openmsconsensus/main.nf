@@ -1,18 +1,18 @@
-process QPX_EXPORT {
-    tag "qpx_export"
+process QPX_OPENMSCONSENSUS {
+    tag "qpx_openmsconsensus"
     label 'process_medium'
     label 'error_retry'
 
     conda "${moduleDir}/environment.yml"
-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'https://depot.galaxyproject.org/singularity/qpx:1.0.2--pyhdfd78af_1'
-        : 'biocontainers/qpx:1.0.2--pyhdfd78af_1'}"
+    // qpx is published to GHCR on every release (immediately available on tag);
+    // a single image serves Docker (native) and Singularity (via docker://).
+    // BioContainers/Galaxy-depot lag the release, so GHCR is used for containers;
+    // -profile conda still resolves the bioconda package in environment.yml.
+    container "ghcr.io/bigbio/qpx:1.1.1"
 
     input:
-    path(diann_report)
-    path(pg_matrix)
+    path(consensusxml)
     path(sdrf)
-    path(diann_log)
     val(project_accession)
 
     output:
@@ -25,25 +25,16 @@ process QPX_EXPORT {
 
     script:
     def args    = task.ext.args ?: ''
-    def prefix  = project_accession ?: 'diann'
-    def pg_arg  = pg_matrix ? "--pg-matrix-path ${pg_matrix}" : ''
-    def log_arg = diann_log ? "--diann-log ${diann_log}" : ''
+    def prefix  = project_accession ?: 'openms'
     def acc_arg = project_accession ? "--project-accession ${project_accession}" : ''
-    def qvalue  = params.matrix_qvalue ?: 0.05
     """
     set -o pipefail
-    qpxc convert diann \\
-        --report-path ${diann_report} \\
+    qpxc convert openms-consensus \\
+        --consensusxml ${consensusxml} \\
         --sdrf-file ${sdrf} \\
-        ${pg_arg} \\
-        ${log_arg} \\
         ${acc_arg} \\
         --output-folder qpx_output \\
         --output-prefix ${prefix} \\
-        --qvalue-threshold ${qvalue} \\
-        --standardized-intensities \\
-        --duckdb-threads ${task.cpus} \\
-        --duckdb-max-memory ${task.memory ? task.memory.toGiga() : 4}GB \\
         --compression zstd \\
         ${args}
 
@@ -58,7 +49,7 @@ ds.close()
 print(f"MuData: {mdata.n_obs} obs x {mdata.n_vars} vars -> ${prefix}.h5mu")
 PY
 
-cat <<-END_VERSIONS > versions.yml
+    cat <<-END_VERSIONS > versions.yml
 "${task.process}":
     qpx: \$(qpxc --version 2>&1 | sed 's/^qpx //')
     mudata: \$(python -c 'import mudata; print(mudata.__version__)')
@@ -66,16 +57,16 @@ END_VERSIONS
     """
 
     stub:
-    def prefix = project_accession ?: 'diann'
+    def prefix = project_accession ?: 'openms'
     """
     mkdir -p qpx_output
     touch qpx_output/stub.parquet
     touch ${prefix}.h5mu
 
     cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        qpx: stub
-        mudata: stub
-    END_VERSIONS
+"${task.process}":
+    qpx: stub
+    mudata: stub
+END_VERSIONS
     """
 }
