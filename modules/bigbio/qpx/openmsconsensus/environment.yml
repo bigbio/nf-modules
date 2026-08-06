@@ -1,7 +1,5 @@
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
-  - pip:
-      - qpx
+  - bioconda::qpx=1.1.1

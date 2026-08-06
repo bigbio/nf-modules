@@ -48,10 +48,10 @@ print(f"MuData: {mdata.n_obs} obs x {mdata.n_vars} vars -> ${prefix}.h5mu")
 PY
 
     cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        qpx: \$(qpxc --version 2>&1 | sed 's/^qpx //')
-        mudata: \$(python -c 'import mudata; print(mudata.__version__)')
-    END_VERSIONS
+"${task.process}":
+    qpx: \$(qpxc --version 2>&1 | sed 's/^qpx //')
+    mudata: \$(python -c 'import mudata; print(mudata.__version__)')
+END_VERSIONS
     """
 
     stub:
@@ -62,9 +62,9 @@ PY
     touch ${prefix}.h5mu
 
     cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        qpx: stub
-        mudata: stub
-    END_VERSIONS
+"${task.process}":
+    qpx: stub
+    mudata: stub
+END_VERSIONS
     """
 }
