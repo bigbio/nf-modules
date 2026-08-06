@@ -10,59 +10,12 @@ nextflow_process {
 
     config "./nextflow.config"
 
-    // NOTE: the real-data test needs an OpenMS consensusXML + SDRF fixture hosted
-    // like the DIA-NN one (a small `<ACC>.zip` under the PRIDE pmultiqc
-    // example-projects). Set `params.test_data.proteomics.qpx.openms_consensusxml`
-    // to that zip URL; until it is uploaded the real test is skipped and only the
-    // stub test runs in CI.
-    test("Should convert OpenMS consensusXML to QPX Parquet + MuData") {
-
-        when {
-            def zipUrl = params.test_data?.proteomics?.qpx?.openms_consensusxml
-            assume(zipUrl != null)
-            def zipFile = file("test_qpx.zip")
-            zipFile.withOutputStream { out ->
-                out << new URL(zipUrl).openStream()
-            }
-            def resultsDir = file("test_qpx_data")
-            resultsDir.mkdirs()
-            new java.util.zip.ZipFile(zipFile).withCloseable { zip ->
-                zip.entries().each { entry ->
-                    if (!entry.isDirectory()) {
-                        def extractFile = new File(resultsDir, entry.name)
-                        extractFile.parentFile.mkdirs()
-                        extractFile.withOutputStream { out ->
-                            out << zip.getInputStream(entry)
-                        }
-                    }
-                }
-            }
-            zipFile.delete()
-
-            process {
-                """
-                input[0] = file('${resultsDir.getAbsolutePath()}/openms.consensusXML')
-                input[1] = file('${resultsDir.getAbsolutePath()}/sample.sdrf.tsv')
-                input[2] = "PXDTEST01"
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert process.success },
-                { assert process.out.qpx_dataset.size() == 1 },
-                { assert process.out.mudata.size() == 1 },
-                { assert process.out.mudata[0].toString().endsWith('.h5mu') },
-                { assert snapshot(process.out.versions).match("versions") }
-            )
-        }
-
-        cleanup {
-            file("test_qpx_data").deleteDir()
-        }
-    }
-
+    // TODO real-data test: mirror the diann subtool's test once a small OpenMS
+    // consensusXML + SDRF fixture (`<ACC>.zip` with `openms.consensusXML` +
+    // `sample.sdrf.tsv`) is hosted under the PRIDE pmultiqc example-projects, then
+    // add a test that downloads it and asserts qpx_dataset/mudata/versions. The
+    // openms-consensus conversion + MuData build have been validated out-of-band
+    // against the qpx 1.1.1 container on a real 2-replicate consensusXML.
     test("Should run stub mode") {
 
         options "-stub"
