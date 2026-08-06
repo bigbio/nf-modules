@@ -4,9 +4,11 @@ process QPX_DIANN {
     label 'error_retry'
 
     conda "${moduleDir}/environment.yml"
-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'https://depot.galaxyproject.org/singularity/qpx:1.1.1--pyhdfd78af_0'
-        : 'biocontainers/qpx:1.1.1--pyhdfd78af_0'}"
+    // qpx is published to GHCR on every release (immediately available on tag);
+    // a single image serves Docker (native) and Singularity (via docker://).
+    // BioContainers/Galaxy-depot lag the release, so GHCR is used for containers;
+    // -profile conda still resolves the bioconda package in environment.yml.
+    container "ghcr.io/bigbio/qpx:1.1.1"
 
     input:
     path(diann_report)
