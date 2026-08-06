@@ -1,12 +1,12 @@
-process QPX_EXPORT {
-    tag "qpx_export"
+process QPX_DIANN {
+    tag "qpx_diann"
     label 'process_medium'
     label 'error_retry'
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'https://depot.galaxyproject.org/singularity/qpx:1.0.2--pyhdfd78af_1'
-        : 'biocontainers/qpx:1.0.2--pyhdfd78af_1'}"
+        ? 'https://depot.galaxyproject.org/singularity/qpx:1.1.1--pyhdfd78af_0'
+        : 'biocontainers/qpx:1.1.1--pyhdfd78af_0'}"
 
     input:
     path(diann_report)

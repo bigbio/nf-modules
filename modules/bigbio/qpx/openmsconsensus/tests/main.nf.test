@@ -1,8 +1,8 @@
 nextflow_process {
 
-    name "Test Process QPX_EXPORT"
+    name "Test Process QPX_OPENMSCONSENSUS"
     script "../main.nf"
-    process "QPX_EXPORT"
+    process "QPX_OPENMSCONSENSUS"
     tag "modules"
     tag "modules_bigbio"
     tag "modules_qpx"
@@ -10,10 +10,16 @@ nextflow_process {
 
     config "./nextflow.config"
 
-    test("Should convert DIA-NN output to QPX Parquet + MuData") {
+    // NOTE: the real-data test needs an OpenMS consensusXML + SDRF fixture hosted
+    // like the DIA-NN one (a small `<ACC>.zip` under the PRIDE pmultiqc
+    // example-projects). Set `params.test_data.proteomics.qpx.openms_consensusxml`
+    // to that zip URL; until it is uploaded the real test is skipped and only the
+    // stub test runs in CI.
+    test("Should convert OpenMS consensusXML to QPX Parquet + MuData") {
 
         when {
-            def zipUrl = (params.test_data?.proteomics?.qpx?.diann_results) ?: "https://ftp.pride.ebi.ac.uk/pub/databases/pride/resources/proteomes/pmultiqc/example-projects/PXD063291.zip"
+            def zipUrl = params.test_data?.proteomics?.qpx?.openms_consensusxml
+            assume(zipUrl != null)
             def zipFile = file("test_qpx.zip")
             zipFile.withOutputStream { out ->
                 out << new URL(zipUrl).openStream()
@@ -35,11 +41,9 @@ nextflow_process {
 
             process {
                 """
-                input[0] = file('${resultsDir.getAbsolutePath()}/PXD063291/DiaNN/report.tsv')
-                input[1] = file('${resultsDir.getAbsolutePath()}/PXD063291/DiaNN/report.pg_matrix.tsv')
-                input[2] = file('${resultsDir.getAbsolutePath()}/PXD063291/PXD063291.sdrf.tsv')
-                input[3] = file('${resultsDir.getAbsolutePath()}/PXD063291/DiaNN/report.log.txt')
-                input[4] = "PXD063291"
+                input[0] = file('${resultsDir.getAbsolutePath()}/openms.consensusXML')
+                input[1] = file('${resultsDir.getAbsolutePath()}/sample.sdrf.tsv')
+                input[2] = "PXDTEST01"
                 """
             }
         }
@@ -66,11 +70,9 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = file("stub_report.tsv", checkIfExists: false)
-                input[1] = file("stub_pg_matrix.tsv", checkIfExists: false)
-                input[2] = file("stub_sample.sdrf.tsv", checkIfExists: false)
-                input[3] = file("stub_diann.log", checkIfExists: false)
-                input[4] = "PXD026600"
+                input[0] = file("stub.consensusXML", checkIfExists: false)
+                input[1] = file("stub_sample.sdrf.tsv", checkIfExists: false)
+                input[2] = "PXD026600"
                 """
             }
         }
