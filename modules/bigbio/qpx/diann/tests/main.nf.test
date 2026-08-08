@@ -1,8 +1,8 @@
 nextflow_process {
 
-    name "Test Process QPX_EXPORT"
+    name "Test Process QPX_DIANN"
     script "../main.nf"
-    process "QPX_EXPORT"
+    process "QPX_DIANN"
     tag "modules"
     tag "modules_bigbio"
     tag "modules_qpx"
