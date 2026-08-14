@@ -9,43 +9,33 @@ tools:
       description: |
         A library for proteomics QC report based on MultiQC framework.
         Use `task.ext.args` to pass additional arguments, e.g.:
-        - `--quantms_plugin` for quantms/dia/tmt/lfq data
-        - `--diann_plugin` for DIANN data
-        - `--maxquant_plugin` for MaxQuant data
-        - `--proteobench_plugin` for ProteoBench data
-        - `--mzid_plugin` for mzID data
-        - `--disable_table` to disable table plots
-        - `--ignored_idxml` to ignore idxML files
-        - `--contaminant_affix VALUE` to specify contaminant affix
-        - `--quantification_method VALUE` to specify quantification method (used with quantms_plugin)
+        - `--quantms-plugin` for quantms/dia/tmt/lfq data
+        - `--qpx-plugin` for a qpx dataset
+        - `--diann-plugin` for DIA-NN data
+        - `--maxquant-plugin` for MaxQuant data
+        - `--proteobench-plugin` for ProteoBench data
+        - `--mzid-plugin` for mzID data
+        - `--disable-table` to disable table plots
+        - `--ignored-idxml` to ignore idXML files
+        - `--contaminant-affix VALUE` to specify contaminant affix
+        - `--quantification-method VALUE` to specify quantification method (used with --quantms-plugin)
+        - `--config FILE` to point at a MultiQC config staged under results/
       homepage: https://github.com/bigbio/pmultiqc/
       documentation: https://github.com/bigbio/pmultiqc/
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'sample1' ]
-  - results:
-      type: directory
-      description: |
-        Directory containing results files to be analyzed by MultiQC
-  - multiqc_config:
+  - multiqc_inputs:
       type: file
       description: |
-        MultiQC configuration file (optional)
-      pattern: "*.yml"
+        All files the report needs (MultiQC config, experimental design, quant
+        tables, qpx dataset, logs, ...), collected into a single channel and staged
+        flat under `results/`. MultiQC runs on `./results`; per-consumer plugin and
+        config flags are supplied through `task.ext.args`.
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'sample1' ]
-  - report:
+  - ch_pmultiqc_report:
       type: file
       description: MultiQC report file
       pattern: "*.html"
-  - quantmsdb:
+  - ch_pmultiqc_db:
       type: file
       description: |
         Sqlite3 database file storing protein, psm and quantification information (optional)
