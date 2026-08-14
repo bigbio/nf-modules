@@ -4,6 +4,6 @@ includeConfig '../../../../tests/config/test_data.config'
 process {
     publishDir = { "${params.outdir}/${task.process.tokenize(':')[-1].tokenize('_')[0].toLowerCase()}" }
     withName: 'PMULTIQC' {
-        ext.args = '--diann_plugin'
+        ext.args = '--diann-plugin --config ./results/multiqc_config.yml'
     }
 }
