@@ -37,7 +37,7 @@ nextflow_process {
             def resultsDir = fetch(zipUrl, "test_results")
             process {
                 """
-                input[0] = file('${resultsDir.getAbsolutePath()}/*')
+                input[0] = file('${resultsDir.getAbsolutePath()}/**')
                 """
             }
         }
@@ -65,7 +65,7 @@ nextflow_process {
             def resultsDir = fetch(zipUrl, "test_diann_results")
             process {
                 """
-                input[0] = file('${resultsDir.getAbsolutePath()}/*')
+                input[0] = file('${resultsDir.getAbsolutePath()}/**')
                 """
             }
         }
@@ -93,7 +93,7 @@ nextflow_process {
             def resultsDir = fetch(zipUrl, "test_quantms_results")
             process {
                 """
-                input[0] = file('${resultsDir.getAbsolutePath()}/*')
+                input[0] = file('${resultsDir.getAbsolutePath()}/**')
                 """
             }
         }
@@ -126,7 +126,7 @@ nextflow_process {
             def resultsDir = fetch(zipUrl, "test_stub_results")
             process {
                 """
-                input[0] = file('${resultsDir.getAbsolutePath()}/*')
+                input[0] = file('${resultsDir.getAbsolutePath()}/**')
                 """
             }
         }
