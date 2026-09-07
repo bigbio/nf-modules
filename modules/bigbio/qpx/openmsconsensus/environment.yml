@@ -2,8 +2,8 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  # qpx 1.1.2 is on PyPI now; bioconda lags a release, so pin the PyPI release to
-  # match the GHCR container version. Switch to `bioconda::qpx=1.1.2` once bioconda
+  # qpx is on PyPI; bioconda lags a release, so pin the PyPI release to match the
+  # GHCR container version. Switch to `bioconda::qpx=<version>` once bioconda
   # publishes it.
   - pip
   - pip:
