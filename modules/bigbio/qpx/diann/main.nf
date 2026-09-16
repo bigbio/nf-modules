@@ -70,8 +70,10 @@ from qpx.mudata import write_dataset_mudata
 # exited 0 (bigbio/qpx#316 - MSV000085836 shipped proteins with no precursors).
 written = write_dataset_mudata(Path("qpx_output"), "${prefix}")
 if written is None:
-    print("WARNING: no MuData view was written; see the log above. "
-          "The qpx_output parquet views are complete and authoritative.")
+    print(
+        "WARNING: no MuData view was written; see the log above. "
+        "The qpx_output parquet views are complete and authoritative."
+    )
 else:
     shutil.move(str(written), "${prefix}.h5mu")
     print(f"MuData -> ${prefix}.h5mu")
