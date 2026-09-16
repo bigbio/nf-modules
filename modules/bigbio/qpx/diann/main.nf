@@ -16,6 +16,11 @@ process QPX_DIANN {
     path(sdrf)
     path(diann_log)
     val(project_accession)
+    // Optional: the FASTA used for the search, or [] when it is not available.
+    // qpx fills null pg.sequence_coverage / pg.molecular_weight and
+    // feature.pg_positions from it, for target rows only, never overwriting a
+    // producer value; proteins absent from it stay null.
+    path(fasta)
 
     output:
     path "qpx_output/*", emit: qpx_dataset
@@ -33,6 +38,7 @@ process QPX_DIANN {
     def pg_arg  = pg_matrix ? "--pg-matrix-path ${pg_matrix}" : ''
     def log_arg = diann_log ? "--diann-log ${diann_log}" : ''
     def acc_arg = project_accession ? "--project-accession ${project_accession}" : ''
+    def fasta_arg = fasta ? "--fasta ${fasta}" : ''
     // Precursor-level cutoff for the features qpx writes. This must follow the
     // pipeline's precursor q-value (--qvalue), NOT matrix_qvalue: the latter
     // governs DIA-NN's output matrices, and using it here silently re-filtered
@@ -47,6 +53,7 @@ process QPX_DIANN {
         ${pg_arg} \\
         ${log_arg} \\
         ${acc_arg} \\
+        ${fasta_arg} \\
         --output-folder qpx_output \\
         --output-prefix ${prefix} \\
         --qvalue-threshold ${qvalue} \\

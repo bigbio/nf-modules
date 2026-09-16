@@ -14,6 +14,11 @@ process QPX_OPENMSCONSENSUS {
     path(consensusxml)
     path(sdrf)
     val(project_accession)
+    // Optional: the FASTA used for the search, or [] when it is not available.
+    // qpx fills null pg.sequence_coverage / pg.molecular_weight and
+    // feature.pg_positions from it, for target rows only, never overwriting a
+    // producer value; proteins absent from it stay null.
+    path(fasta)
 
     output:
     path "qpx_output/*", emit: qpx_dataset
@@ -29,12 +34,14 @@ process QPX_OPENMSCONSENSUS {
     def args    = task.ext.args ?: ''
     def prefix  = project_accession ?: 'openms'
     def acc_arg = project_accession ? "--project-accession ${project_accession}" : ''
+    def fasta_arg = fasta ? "--fasta ${fasta}" : ''
     """
     set -o pipefail
     qpxc convert openms-consensus \\
         --consensusxml ${consensusxml} \\
         --sdrf-file ${sdrf} \\
         ${acc_arg} \\
+        ${fasta_arg} \\
         --output-folder qpx_output \\
         --output-prefix ${prefix} \\
         --compression zstd \\
