@@ -40,6 +40,7 @@ nextflow_process {
                 input[2] = file('${resultsDir.getAbsolutePath()}/PXD063291/PXD063291.sdrf.tsv')
                 input[3] = file('${resultsDir.getAbsolutePath()}/PXD063291/DiaNN/report.log.txt')
                 input[4] = "PXD063291"
+                input[5] = []
                 """
             }
         }
@@ -71,6 +72,7 @@ nextflow_process {
                 input[2] = file("stub_sample.sdrf.tsv", checkIfExists: false)
                 input[3] = file("stub_diann.log", checkIfExists: false)
                 input[4] = "PXD026600"
+                input[5] = []
                 """
             }
         }
