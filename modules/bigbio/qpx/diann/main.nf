@@ -63,7 +63,6 @@ process QPX_DIANN {
         --output-folder qpx_output \\
         --output-prefix ${prefix} \\
         --qvalue-threshold ${qvalue} \\
-        --standardized-intensities \\
         --max-cpus ${task.cpus} \\
         --max-memory ${task.memory ? task.memory.toGiga() : 4}GB \\
         --compression zstd \\
