@@ -34,7 +34,7 @@ process PMULTIQC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pmultiqc: \$(multiqc --pmultiqc_version | sed -e "s/pmultiqc, version //g")
+        pmultiqc: \$(multiqc --pmultiqc-version | sed -e "s/pmultiqc, version //g")
     END_VERSIONS
     """
 
@@ -45,7 +45,7 @@ process PMULTIQC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pmultiqc: \$(multiqc --pmultiqc_version | sed -e "s/pmultiqc, version //g" 2>/dev/null || echo "0.0.48")
+        pmultiqc: \$(multiqc --pmultiqc-version | sed -e "s/pmultiqc, version //g" 2>/dev/null || echo "0.0.48")
     END_VERSIONS
     """
 }
