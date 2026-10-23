@@ -47,6 +47,13 @@ input:
         target rows; producer values are never overwritten and proteins absent from
         the FASTA (e.g. DIA-NN internal decoys) stay null.
       pattern: "*.{fasta,fa,fasta.gz,fa.gz}"
+  - ms_info:
+      type: file
+      description: |
+        Optional per-run MS info tables (quantms-utils mzmlstats), or [] when
+        unavailable. qpx assigns each feature its MS2 scan from them.
+        qpx keeps only the runs that have a table, so provide one for every run.
+      pattern: "*_ms_info.parquet"
 output:
   qpx_dataset:
     - "qpx_output/*":

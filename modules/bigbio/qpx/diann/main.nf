@@ -8,7 +8,7 @@ process QPX_DIANN {
     // a single image serves Docker (native) and Singularity (via docker://).
     // BioContainers/Galaxy-depot lag the release, so GHCR is used for containers;
     // -profile conda still resolves the bioconda package in environment.yml.
-    container "ghcr.io/bigbio/qpx:1.1.5"
+    container "ghcr.io/bigbio/qpx:1.1.6"
 
     input:
     path(diann_report)
@@ -21,6 +21,10 @@ process QPX_DIANN {
     // feature.pg_positions from it, for target rows only, never overwriting a
     // producer value; proteins absent from it stay null.
     path(fasta)
+    // Optional: one *_ms_info.parquet per run (quantms-utils mzmlstats), or [].
+    // qpx assigns each feature its MS2 scan from them. qpx keeps only the runs it
+    // has MS info for, so pass them for every run or not at all.
+    path(ms_info, stageAs: "ms_info/*")
 
     output:
     path "qpx_output/*", emit: qpx_dataset
@@ -39,6 +43,7 @@ process QPX_DIANN {
     def log_arg = diann_log ? "--diann-log ${diann_log}" : ''
     def acc_arg = project_accession ? "--project-accession ${project_accession}" : ''
     def fasta_arg = fasta ? "--fasta ${fasta}" : ''
+    def ms_info_arg = ms_info ? "--mzml-info-folder ms_info" : ''
     // Precursor-level cutoff for the features qpx writes. This must follow the
     // pipeline's precursor q-value (--qvalue), NOT matrix_qvalue: the latter
     // governs DIA-NN's output matrices, and using it here silently re-filtered
@@ -54,10 +59,10 @@ process QPX_DIANN {
         ${log_arg} \\
         ${acc_arg} \\
         ${fasta_arg} \\
+        ${ms_info_arg} \\
         --output-folder qpx_output \\
         --output-prefix ${prefix} \\
         --qvalue-threshold ${qvalue} \\
-        --standardized-intensities \\
         --max-cpus ${task.cpus} \\
         --max-memory ${task.memory ? task.memory.toGiga() : 4}GB \\
         --compression zstd \\

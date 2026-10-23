@@ -41,6 +41,7 @@ nextflow_process {
                 input[3] = file('${resultsDir.getAbsolutePath()}/PXD063291/DiaNN/report.log.txt')
                 input[4] = "PXD063291"
                 input[5] = []
+                input[6] = []
                 """
             }
         }
@@ -73,6 +74,7 @@ nextflow_process {
                 input[3] = file("stub_diann.log", checkIfExists: false)
                 input[4] = "PXD026600"
                 input[5] = []
+                input[6] = []
                 """
             }
         }
